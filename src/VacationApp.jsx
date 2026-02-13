@@ -459,8 +459,21 @@ function CalendarView({ employees, vacations, conflicts, calMonth, setCalMonth, 
                     const isConf = conflicts.has(v.id);
                     const bg = isConf ? COLORS.conflict : COLORS[v.status];
                     return (
-                      <div key={v.id} onClick={() => { }} style={{ background: bg + "22", border:`1px solid ${bg}`, color: bg, borderRadius:4, padding:"1px 5px", fontSize:10, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", cursor:"pointer" }}
-                        onClick={() => { const d2 = vacations.find(x => x.id === v.id); /* pass */ }}>
+                      <div key={v.id}
+    onClick={() => {}}
+    style={{
+      background: bg + "22",
+      border: `1px solid ${bg}`,
+      color: bg,
+      borderRadius: 4,
+      padding: "1px 5px",
+      fontSize: 10,
+      fontWeight: 600,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      cursor: "pointer"
+    }}>
                         {emp?.name.split(" ")[0] ?? "—"}
                       </div>
                     );
