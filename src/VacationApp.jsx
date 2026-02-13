@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 // ─── INITIAL DATA ────────────────────────────────────────────────────────────
 const TODAY = new Date("2026-02-12");
