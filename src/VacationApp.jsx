@@ -39,7 +39,6 @@ const fmt = (d) => {
 };
 const diffDays = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 86400000) + 1;
 const daysUntil = (dateStr) => Math.round((parseDate(dateStr) - TODAY) / 86400000);
-const isoToday = () => TODAY.toISOString().split("T")[0];
 
 function getStatus(emp) {
   const d = daysUntil(emp.expiration);
@@ -257,7 +256,6 @@ function TopBar({ view }) {
 function Dashboard({ employees, vacations, alerts, conflicts, setView, setModal }) {
   const activeVacs = vacations.filter(v => v.status === "in_progress");
   const plannedVacs = vacations.filter(v => v.status === "planned");
-  const totalRemaining = employees.reduce((s,e) => s + Math.max(0, e.totalDays - e.usedDays - e.soldDays), 0);
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
