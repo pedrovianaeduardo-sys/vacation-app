@@ -131,27 +131,88 @@ export default function App() {
     setTimeout(() => setToast(null), 3200);
   }
 
-  function saveEmployee(emp) {
+  async function saveEmployee(emp) {
     if (emp.id) {
+      const { error } = await supabase
+       .from("employees")
+       .update({
+          name: emp.name,
+          admission: emp.admission,
+          accrual_start: emp.accrual_start,
+          accrual_end: emp.accrual_end,
+          total_days: emp.total_days,
+          used_days: emp.used_days,
+          sold_days: emp.sold_days,
+          expiration: emp.expiration
+        })
+        .eq("id", emp.id); 
+    if (error) {     
+      console.error(error);
+      showToast("Erro ao atualizar colaborador", "warn");
+      return;
+    }
+
+      
+      
+      
       setEmployees(es => es.map(e => e.id === emp.id ? emp : e));
       addLog("EDITADO", emp.name, "Dados do colaborador atualizados");
+      showToast("Colaborador atualizado!");
     } else {
-      const newEmp = { ...emp, id: Date.now() };
-      setEmployees(es => [...es, newEmp]);
+      const { data, error } = await supabase
+       .from("employees")
+       .insert([{
+         name: emp.name,
+         admission: emp.admission,
+         accrual_start: emp.accrual_start,
+         accrual_end: emp.accrual_end,
+         total_days: emp.total_days,
+         used_days: emp.used_days ?? 0,
+         sold_days: emp.sold_days ?? 0,
+         expiration: emp.expiration
+        }])
+        .select();
+
+      if (error) {
+        console.error(error);
+        showToast("Erro ao criar colaborador", "warn");
+        return;
+      }
+
+
+      setEmployees(es => [...es, ...data]);
       addLog("CRIADO", emp.name, "Colaborador cadastrado no sistema");
     }
     showToast(emp.id ? "Colaborador atualizado!" : "Colaborador criado!");
     setModal(null);
   }
 
-  function removeEmployee(id) {
+  // remover os colaboradores modificado 
+  
+  async function removeEmployee(id) {
     const emp = employees.find(e => e.id === id);
+    const { error } = await supabase
+      .from("employees") 
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      showToast("Erro ao remover colaborador", "warn");
+      return;
+    }
+
+
+
+
     setEmployees(es => es.filter(e => e.id !== id));
     setVacations(vs => vs.filter(v => v.employeeId !== id));
-    addLog("REMOVIDO", emp.name, "Colaborador excluído do sistema");
+    addLog("REMOVIDO", emp?.name, "Colaborador excluído do sistema");
     showToast("Colaborador removido.", "warn");
     setModal(null);
   }
+
+  // salvar as férias (vacations to ficando doido já kkkkk)
 
   function saveVacation(vac) {
     const emp = employees.find(e => e.id === vac.employeeId);
