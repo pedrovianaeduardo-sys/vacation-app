@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
-import { supabase } from "./supabase";
 import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
+
 
 // New function hihi kkkk
 async function loadEmployees() {
