@@ -1,4 +1,25 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "./supabase";
+import { useEffect, useState } from "react";
+
+// New function hihi kkkk
+async function loadEmployees() {
+  const { data, error } = await supabase
+    .from("employees")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Erro ao carregar funcionários:", error);
+    return;
+  }
+
+  setEmployees(data);
+}
+
+useEffect(() => {
+  loadEmployees();
+}, []);
 
 // ─── INITIAL DATA ────────────────────────────────────────────────────────────
 const TODAY = new Date("2026-02-12");
@@ -39,6 +60,7 @@ const fmt = (d) => {
 };
 const diffDays = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 86400000) + 1;
 const daysUntil = (dateStr) => Math.round((parseDate(dateStr) - TODAY) / 86400000);
+const isoToday = () => TODAY.toISOString().split("T")[0];
 
 function getStatus(emp) {
   const d = daysUntil(emp.expiration);
@@ -88,7 +110,7 @@ function detectConflicts(vacations) {
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [employees, setEmployees]   = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
   const [vacations, setVacations]   = useState(initialVacations);
   const [logs, setLogs]             = useState(initialLogs);
   const [view, setView]             = useState("dashboard");
@@ -256,6 +278,7 @@ function TopBar({ view }) {
 function Dashboard({ employees, vacations, alerts, conflicts, setView, setModal }) {
   const activeVacs = vacations.filter(v => v.status === "in_progress");
   const plannedVacs = vacations.filter(v => v.status === "planned");
+  const totalRemaining = employees.reduce((s,e) => s + Math.max(0, e.totalDays - e.usedDays - e.soldDays), 0);
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
@@ -457,21 +480,8 @@ function CalendarView({ employees, vacations, conflicts, calMonth, setCalMonth, 
                     const isConf = conflicts.has(v.id);
                     const bg = isConf ? COLORS.conflict : COLORS[v.status];
                     return (
-                      <div key={v.id}
-    onClick={() => {}}
-    style={{
-      background: bg + "22",
-      border: `1px solid ${bg}`,
-      color: bg,
-      borderRadius: 4,
-      padding: "1px 5px",
-      fontSize: 10,
-      fontWeight: 600,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      cursor: "pointer"
-    }}>
+                      <div key={v.id} onClick={() => { }} style={{ background: bg + "22", border:`1px solid ${bg}`, color: bg, borderRadius:4, padding:"1px 5px", fontSize:10, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", cursor:"pointer" }}
+                        eu={() => { const d2 = vacations.find(x => x.id === v.id); /* pass */ }}>
                         {emp?.name.split(" ")[0] ?? "—"}
                       </div>
                     );
@@ -561,7 +571,7 @@ function EmployeeModal({ data, onSave, onRemove, onClose }) {
             <Field label="Dias vendidos"><input type="number" value={form.soldDays} onChange={e => upd("soldDays",+e.target.value)} style={inp} /></Field>
           </div>
           <div style={{ display:"flex", gap:10, justifyContent:"space-between", marginTop:8 }}>
-            {isEdit && <button onClick={() => { if(window.confirm("Remover colaborador?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
+            {isEdit && <button onClick={() => { if(confirm("Remover colaborador?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
             <div style={{ display:"flex", gap:10, marginLeft:"auto" }}>
               <button onClick={onClose} style={{ background:"#F3F4F6", color:"#374151", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Cancelar</button>
               <button onClick={() => onSave(form)} style={{ background:"#1D4ED8", color:"#fff", padding:"9px 20px", borderRadius:8, fontWeight:600, fontSize:13 }}>Salvar</button>
@@ -634,7 +644,7 @@ function VacationModal({ data, employees, vacations, conflicts, onSave, onRemove
           )}
 
           <div style={{ display:"flex", gap:10, justifyContent:"space-between", marginTop:4 }}>
-            {isEdit && <button onClick={() => { if(window.confirm("Remover estas férias?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
+            {isEdit && <button onClick={() => { if(confirm("Remover estas férias?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
             <div style={{ display:"flex", gap:10, marginLeft:"auto" }}>
               <button onClick={onClose} style={{ background:"#F3F4F6", color:"#374151", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Cancelar</button>
               <button onClick={checkAndSave} style={{ background: conflictWarn ? "#DC2626" : "#1D4ED8", color:"#fff", padding:"9px 20px", borderRadius:8, fontWeight:600, fontSize:13 }}>
