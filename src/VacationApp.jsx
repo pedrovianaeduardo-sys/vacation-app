@@ -632,7 +632,7 @@ function EmployeeModal({ data, onSave, onRemove, onClose }) {
             <Field label="Dias vendidos"><input type="number" value={form.soldDays} onChange={e => upd("soldDays",+e.target.value)} style={inp} /></Field>
           </div>
           <div style={{ display:"flex", gap:10, justifyContent:"space-between", marginTop:8 }}>
-            {isEdit && <button onClick={() => { if(confirm("Remover colaborador?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
+            {isEdit && <button onClick={() => { if(window.confirm("Remover colaborador?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
             <div style={{ display:"flex", gap:10, marginLeft:"auto" }}>
               <button onClick={onClose} style={{ background:"#F3F4F6", color:"#374151", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Cancelar</button>
               <button onClick={() => onSave(form)} style={{ background:"#1D4ED8", color:"#fff", padding:"9px 20px", borderRadius:8, fontWeight:600, fontSize:13 }}>Salvar</button>
@@ -705,7 +705,7 @@ function VacationModal({ data, employees, vacations, conflicts, onSave, onRemove
           )}
 
           <div style={{ display:"flex", gap:10, justifyContent:"space-between", marginTop:4 }}>
-            {isEdit && <button onClick={() => { if(confirm("Remover estas férias?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
+            {isEdit && <button onClick={() => { if(window.confirm("Remover estas férias?")) onRemove(data.id); }} style={{ background:"#FEE2E2", color:"#B91C1C", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Remover</button>}
             <div style={{ display:"flex", gap:10, marginLeft:"auto" }}>
               <button onClick={onClose} style={{ background:"#F3F4F6", color:"#374151", padding:"9px 16px", borderRadius:8, fontWeight:600, fontSize:13 }}>Cancelar</button>
               <button onClick={checkAndSave} style={{ background: conflictWarn ? "#DC2626" : "#1D4ED8", color:"#fff", padding:"9px 20px", borderRadius:8, fontWeight:600, fontSize:13 }}>
