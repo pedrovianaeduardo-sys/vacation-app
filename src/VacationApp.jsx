@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { supabase } from "./supabase";
 import { useEffect, useState } from "react";
 
@@ -188,7 +188,7 @@ export default function App() {
   }
 
   // remover os colaboradores modificado 
-  
+
   async function removeEmployee(id) {
     const emp = employees.find(e => e.id === id);
     const { error } = await supabase
