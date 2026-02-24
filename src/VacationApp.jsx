@@ -7,17 +7,6 @@ import { supabase } from "./supabase";
 // ─── INITIAL DATA ────────────────────────────────────────────────────────────
 const TODAY = new Date("2026-02-12");
 
-const initialEmployees = [
-  { id: 1, name: "Bruno Rita",        admission: "2022-03-15", accrualStart: "2025-03-15", accrualEnd: "2026-03-14", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2026-09-14" },
-  { id: 2, name: "Douglas Magalhães", admission: "2021-07-01", accrualStart: "2024-07-01", accrualEnd: "2025-06-30", totalDays: 30, usedDays: 10, soldDays: 0, expiration: "2026-03-01" },
-  { id: 3, name: "Fabiano Silvério",  admission: "2020-01-20", accrualStart: "2025-01-20", accrualEnd: "2026-01-19", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2026-07-19" },
-  { id: 4, name: "Filipe da Costa",   admission: "2023-05-08", accrualStart: "2025-05-08", accrualEnd: "2026-05-07", totalDays: 30, usedDays: 15, soldDays: 0, expiration: "2026-11-07" },
-  { id: 5, name: "João Junior",       admission: "2021-11-22", accrualStart: "2024-11-22", accrualEnd: "2025-11-21", totalDays: 30, usedDays: 0,  soldDays: 5, expiration: "2026-02-21" },
-  { id: 6, name: "João Paulo",        admission: "2022-08-14", accrualStart: "2025-08-14", accrualEnd: "2026-08-13", totalDays: 30, usedDays: 20, soldDays: 0, expiration: "2027-02-13" },
-  { id: 7, name: "William Oliveira",  admission: "2020-06-30", accrualStart: "2025-06-30", accrualEnd: "2026-06-29", totalDays: 30, usedDays: 5,  soldDays: 0, expiration: "2026-12-29" },
-  { id: 8, name: "Victor Fonseca",    admission: "2023-09-04", accrualStart: "2025-09-04", accrualEnd: "2026-09-03", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2027-03-03" },
-];
-
 const initialVacations = [
   { id: 1,  employeeId: 2, start: "2026-02-16", end: "2026-02-25", status: "planned",     type: "vacation", note: "Primeira parcela" },
   { id: 2,  employeeId: 5, start: "2026-02-09", end: "2026-02-19", status: "in_progress", type: "vacation", note: "Urgente – vence em breve" },
@@ -43,7 +32,7 @@ const fmt = (d) => {
 };
 const diffDays = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 86400000) + 1;
 const daysUntil = (dateStr) => Math.round((parseDate(dateStr) - TODAY) / 86400000);
-const isoToday = () => TODAY.toISOString().split("T")[0];
+
 
 function getStatus(emp) {
   const d = daysUntil(emp.expiration);
@@ -542,7 +531,7 @@ function CalendarView({ employees, vacations, conflicts, calMonth, setCalMonth, 
                     const bg = isConf ? COLORS.conflict : COLORS[v.status];
                     return (
                       <div key={v.id} onClick={() => { }} style={{ background: bg + "22", border:`1px solid ${bg}`, color: bg, borderRadius:4, padding:"1px 5px", fontSize:10, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", cursor:"pointer" }}
-                        eu={() => { const d2 = vacations.find(x => x.id === v.id); /* pass */ }}>
+                        eu={() => {  /* pass */ }}>
                         {emp?.name.split(" ")[0] ?? "—"}
                       </div>
                     );
