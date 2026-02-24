@@ -328,7 +328,7 @@ function TopBar({ view }) {
 function Dashboard({ employees, vacations, alerts, conflicts, setView, setModal }) {
   const activeVacs = vacations.filter(v => v.status === "in_progress");
   const plannedVacs = vacations.filter(v => v.status === "planned");
-  const totalRemaining = employees.reduce((s,e) => s + Math.max(0, e.totalDays - e.usedDays - e.soldDays), 0);
+  
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
