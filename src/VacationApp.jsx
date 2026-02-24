@@ -129,12 +129,12 @@ export default function App() {
        .update({
           name: emp.name,
           admission: emp.admission,
-          accrual_start: emp.hire_date,
-          accrual_end: emp.accrual_end,
-          total_days: emp.total_days,
-          used_days: emp.used_days,
-          sold_days: emp.sold_days,
-          expiration: emp.expiration
+          accrual_start: emp.accrual_start ?? emp.admission,
+          accrual_end: emp.accrual_end ?? null,
+          total_days: emp.total_days ?? 30,
+          used_days: emp.used_days ?? 0,
+          sold_days: emp.sold_days ?? 0,
+          expiration: emp.expiration ?? null
         })
         .eq("id", emp.id); 
     if (error) {     
@@ -151,14 +151,14 @@ export default function App() {
       const { data, error } = await supabase
        .from("employees")
        .insert([{
-         name: emp.name,
-         admission: emp.admission,
-         accrual_start: emp.hire_date,
-         accrual_end: emp.accrual_end,
-         total_days: emp.total_days,
-         used_days: emp.used_days ?? 0,
-         sold_days: emp.sold_days ?? 0,
-         expiration: emp.expiration
+          name: emp.name,
+          admission: emp.admission,
+          accrual_start: emp.accrual_start ?? emp.admission,
+          accrual_end: emp.accrual_end ?? null,
+          total_days: emp.total_days ?? 30,
+          used_days: emp.used_days ?? 0,
+          sold_days: emp.sold_days ?? 0,
+          expiration: emp.expiration ?? null
         }])
         .select();
 
