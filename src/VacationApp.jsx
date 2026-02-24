@@ -129,7 +129,7 @@ export default function App() {
        .update({
           name: emp.name,
           admission: emp.admission,
-          accrual_start: emp.accrual_start,
+          accrual_start: emp.hire_date,
           accrual_end: emp.accrual_end,
           total_days: emp.total_days,
           used_days: emp.used_days,
@@ -153,7 +153,7 @@ export default function App() {
        .insert([{
          name: emp.name,
          admission: emp.admission,
-         accrual_start: emp.accrual_start,
+         accrual_start: emp.hire_date,
          accrual_end: emp.accrual_end,
          total_days: emp.total_days,
          used_days: emp.used_days ?? 0,
