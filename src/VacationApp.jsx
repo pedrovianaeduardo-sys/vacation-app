@@ -1,18 +1,11 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "./supabase";
+
+
+
 
 // ─── INITIAL DATA ────────────────────────────────────────────────────────────
 const TODAY = new Date("2026-02-12");
-
-const initialEmployees = [
-  { id: 1, name: "Bruno Rita",        admission: "2022-03-15", accrualStart: "2025-03-15", accrualEnd: "2026-03-14", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2026-09-14" },
-  { id: 2, name: "Douglas Magalhães", admission: "2021-07-01", accrualStart: "2024-07-01", accrualEnd: "2025-06-30", totalDays: 30, usedDays: 10, soldDays: 0, expiration: "2026-03-01" },
-  { id: 3, name: "Fabiano Silvério",  admission: "2020-01-20", accrualStart: "2025-01-20", accrualEnd: "2026-01-19", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2026-07-19" },
-  { id: 4, name: "Filipe da Costa",   admission: "2023-05-08", accrualStart: "2025-05-08", accrualEnd: "2026-05-07", totalDays: 30, usedDays: 15, soldDays: 0, expiration: "2026-11-07" },
-  { id: 5, name: "João Junior",       admission: "2021-11-22", accrualStart: "2024-11-22", accrualEnd: "2025-11-21", totalDays: 30, usedDays: 0,  soldDays: 5, expiration: "2026-02-21" },
-  { id: 6, name: "João Paulo",        admission: "2022-08-14", accrualStart: "2025-08-14", accrualEnd: "2026-08-13", totalDays: 30, usedDays: 20, soldDays: 0, expiration: "2027-02-13" },
-  { id: 7, name: "William Oliveira",  admission: "2020-06-30", accrualStart: "2025-06-30", accrualEnd: "2026-06-29", totalDays: 30, usedDays: 5,  soldDays: 0, expiration: "2026-12-29" },
-  { id: 8, name: "Victor Fonseca",    admission: "2023-09-04", accrualStart: "2025-09-04", accrualEnd: "2026-09-03", totalDays: 30, usedDays: 0,  soldDays: 0, expiration: "2027-03-03" },
-];
 
 const initialVacations = [
   { id: 1,  employeeId: 2, start: "2026-02-16", end: "2026-02-25", status: "planned",     type: "vacation", note: "Primeira parcela" },
@@ -39,6 +32,7 @@ const fmt = (d) => {
 };
 const diffDays = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 86400000) + 1;
 const daysUntil = (dateStr) => Math.round((parseDate(dateStr) - TODAY) / 86400000);
+
 
 function getStatus(emp) {
   const d = daysUntil(emp.expiration);
@@ -88,7 +82,7 @@ function detectConflicts(vacations) {
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [employees, setEmployees]   = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
   const [vacations, setVacations]   = useState(initialVacations);
   const [logs, setLogs]             = useState(initialLogs);
   const [view, setView]             = useState("dashboard");
@@ -108,28 +102,106 @@ export default function App() {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3200);
   }
+  // New function hihi kkkk
+  async function loadEmployees()  {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .order("id", { ascending: true });
 
-  function saveEmployee(emp) {
+    if (error) {
+      console.error("Erro ao carregar funcionários:", error);
+      return;
+    }
+
+      setEmployees(data);
+
+    }
+
+      useEffect(() => {
+      loadEmployees();
+    }, []);
+
+  async function saveEmployee(emp) {
     if (emp.id) {
+      const { error } = await supabase
+       .from("employees")
+       .update({
+          name: emp.name,
+          admission: emp.admission,
+          accrual_start: emp.accrual_start ?? emp.admission,
+          accrual_end: emp.accrual_end ?? null,
+          total_days: emp.total_days ?? 30,
+          used_days: emp.used_days ?? 0,
+          sold_days: emp.sold_days ?? 0,
+          expiration: emp.expiration ?? null
+        })
+        .eq("id", emp.id); 
+    if (error) {     
+      console.error(error);
+      showToast("Erro ao atualizar colaborador", "warn");
+      return;
+    }
+
+    
       setEmployees(es => es.map(e => e.id === emp.id ? emp : e));
       addLog("EDITADO", emp.name, "Dados do colaborador atualizados");
+      showToast("Colaborador atualizado!");
     } else {
-      const newEmp = { ...emp, id: Date.now() };
-      setEmployees(es => [...es, newEmp]);
+      const { data, error } = await supabase
+       .from("employees")
+       .insert([{
+          name: emp.name,
+          admission: emp.admission,
+          accrual_start: emp.accrual_start ?? emp.admission,
+          accrual_end: emp.accrual_end ?? null,
+          total_days: emp.total_days ?? 30,
+          used_days: emp.used_days ?? 0,
+          sold_days: emp.sold_days ?? 0,
+          expiration: emp.expiration ?? null
+        }])
+        .select();
+
+      if (error) {
+        console.error(error);
+        showToast("Erro ao criar colaborador", "warn");
+        return;
+      }
+
+
+      setEmployees(es => [...es, ...data]);
       addLog("CRIADO", emp.name, "Colaborador cadastrado no sistema");
     }
     showToast(emp.id ? "Colaborador atualizado!" : "Colaborador criado!");
     setModal(null);
   }
 
-  function removeEmployee(id) {
+  // remover os colaboradores modificado 
+
+  async function removeEmployee(id) {
     const emp = employees.find(e => e.id === id);
+    const { error } = await supabase
+      .from("employees") 
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      showToast("Erro ao remover colaborador", "warn");
+      return;
+    }
+
+
+
+
     setEmployees(es => es.filter(e => e.id !== id));
     setVacations(vs => vs.filter(v => v.employeeId !== id));
-    addLog("REMOVIDO", emp.name, "Colaborador excluído do sistema");
+    addLog("REMOVIDO", emp?.name, "Colaborador excluído do sistema");
     showToast("Colaborador removido.", "warn");
     setModal(null);
   }
+
+  // salvar as férias (vacations to ficando doido já kkkkk)
 
   function saveVacation(vac) {
     const emp = employees.find(e => e.id === vac.employeeId);
@@ -256,6 +328,7 @@ function TopBar({ view }) {
 function Dashboard({ employees, vacations, alerts, conflicts, setView, setModal }) {
   const activeVacs = vacations.filter(v => v.status === "in_progress");
   const plannedVacs = vacations.filter(v => v.status === "planned");
+  
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
@@ -457,21 +530,8 @@ function CalendarView({ employees, vacations, conflicts, calMonth, setCalMonth, 
                     const isConf = conflicts.has(v.id);
                     const bg = isConf ? COLORS.conflict : COLORS[v.status];
                     return (
-                      <div key={v.id}
-    onClick={() => {}}
-    style={{
-      background: bg + "22",
-      border: `1px solid ${bg}`,
-      color: bg,
-      borderRadius: 4,
-      padding: "1px 5px",
-      fontSize: 10,
-      fontWeight: 600,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      cursor: "pointer"
-    }}>
+                      <div key={v.id} onClick={() => { }} style={{ background: bg + "22", border:`1px solid ${bg}`, color: bg, borderRadius:4, padding:"1px 5px", fontSize:10, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", cursor:"pointer" }}
+                        eu={() => {  /* pass */ }}>
                         {emp?.name.split(" ")[0] ?? "—"}
                       </div>
                     );
