@@ -1,25 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "./supabase";
 
 
-// New function hihi kkkk
-async function loadEmployees() {
-  const { data, error } = await supabase
-    .from("employees")
-    .select("*")
-    .order("id", { ascending: true });
 
-  if (error) {
-    console.error("Erro ao carregar funcionários:", error);
-    return;
-  }
-
-  setEmployees(data);
-}
-
-useEffect(() => {
-  loadEmployees();
-}, []);
 
 // ─── INITIAL DATA ────────────────────────────────────────────────────────────
 const TODAY = new Date("2026-02-12");
@@ -130,6 +113,25 @@ export default function App() {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3200);
   }
+  // New function hihi kkkk
+  async function loadEmployees()  {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .order("id", { ascending: true });
+
+    if (error) {
+      console.error("Erro ao carregar funcionários:", error);
+      return;
+    }
+
+      setEmployees(data);
+
+    }
+
+      useEffect(() => {
+      loadEmployees();
+    }, []);
 
   async function saveEmployee(emp) {
     if (emp.id) {
@@ -152,9 +154,7 @@ export default function App() {
       return;
     }
 
-      
-      
-      
+    
       setEmployees(es => es.map(e => e.id === emp.id ? emp : e));
       addLog("EDITADO", emp.name, "Dados do colaborador atualizados");
       showToast("Colaborador atualizado!");
